@@ -45,7 +45,7 @@ if [ ! -d "$APP_SOURCE_DIR/.meteor" ] && [ -d "$APP_SOURCE_DIR/App/.meteor" ]; t
   if [ -d "$APP_SOURCE_DIR/Resources" ]; then
     rm -rf "$APP_SOURCE_DIR/Resources"
   fi
-  APP_SOURCE_DIR="$APP_SOURCE_DIR/App/"
+  APP_SOURCE_DIR="$APP_SOURCE_DIR/App"
 fi
 
 # The Iron scaffolding tool (https://github.com/iron-meteor/iron-cli) place the
@@ -58,10 +58,10 @@ fi
 METEOR_DIR=`mktemp -d "$BUILDPACK_DIR"/meteor-XXXX`
 # Where we'll put things we compile.
 COMPILE_DIR_SUFFIX=".meteor/heroku_build"
-COMPILE_DIR="$APP_CHECKOUT_DIR"/"$COMPILE_DIR_SUFFIX"
+COMPILE_DIR="APP_SOURCE_DIR"/"$COMPILE_DIR_SUFFIX"
 
 # Create directories as needed.
-mkdir -p "$APP_CHECKOUT_DIR" "$METEOR_DIR" "$COMPILE_DIR"
+mkdir -p "APP_SOURCE_DIR" "$METEOR_DIR" "$COMPILE_DIR"
 
 # Update the path so we get npm, etc.
 PATH="$COMPILE_DIR/bin:$PATH"
