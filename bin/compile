@@ -32,6 +32,19 @@ APP_SOURCE_DIR="$APP_CHECKOUT_DIR"
 
 # there is no Meteor app in the root, modded by JJR (+ /App)
 if [ ! -d "$APP_SOURCE_DIR/.meteor" ] && [ -d "$APP_SOURCE_DIR/App/.meteor" ]; then
+  STRUCTURE_TYPE="jorisroling"
+  if [ -d "$APP_SOURCE_DIR/Build" ]; then
+    rm -rf "$APP_SOURCE_DIR/Build"
+  fi
+  if [ -d "$APP_SOURCE_DIR/Mobile" ]; then
+    rm -rf "$APP_SOURCE_DIR/Mobile"
+  fi
+  if [ -d "$APP_SOURCE_DIR/Data" ]; then
+    rm -rf "$APP_SOURCE_DIR/Data"
+  fi
+  if [ -d "$APP_SOURCE_DIR/Resources" ]; then
+    rm -rf "$APP_SOURCE_DIR/Resources"
+  fi
   APP_SOURCE_DIR="$APP_SOURCE_DIR/App/"
 fi
 
