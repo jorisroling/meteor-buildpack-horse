@@ -45,7 +45,7 @@ if [ ! -d "$APP_SOURCE_DIR/.meteor" ] && [ -d "$APP_SOURCE_DIR/App/.meteor" ]; t
   if [ -d "$APP_SOURCE_DIR/Resources" ]; then
     rm -rf "$APP_SOURCE_DIR/Resources"
   fi
-  APP_SOURCE_DIR="$APP_SOURCE_DIR/App"
+  APP_SOURCE_DIR="$APP_SOURCE_DIR/App/"
   echo "-----> Structure type: $STRUCTURE_TYPE"
 fi
 
