@@ -59,10 +59,10 @@ fi
 METEOR_DIR=`mktemp -d "$BUILDPACK_DIR"/meteor-XXXX`
 # Where we'll put things we compile.
 COMPILE_DIR_SUFFIX=".meteor/heroku_build"
-COMPILE_DIR="APP_CHECKOUT_DIR"/"$COMPILE_DIR_SUFFIX"
+COMPILE_DIR="$APP_CHECKOUT_DIR"/"$COMPILE_DIR_SUFFIX"
 
 # Create directories as needed.
-mkdir -p "APP_CHECKOUT_DIR" "$METEOR_DIR" "$COMPILE_DIR"
+mkdir -p "$APP_CHECKOUT_DIR" "$METEOR_DIR" "$COMPILE_DIR"
 
 # Update the path so we get npm, etc.
 PATH="$COMPILE_DIR/bin:$PATH"
