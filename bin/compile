@@ -85,8 +85,8 @@ export CPPPATH="$CPATH"
 echo "-----> Installing meteor"
 curl -sS https://install.meteor.com | HOME="$METEOR_DIR" /bin/sh
 METEOR="$METEOR_DIR/.meteor/meteor" # The meteor binary.
-echo "-----> Updating meteor to release 1.3-cordova-beta.3"
-$METEOR update --release 1.3-cordova-beta.3
+# echo "-----> Updating meteor to release 1.3-cordova-beta.3"
+# $METEOR update --release 1.3-cordova-beta.3
 
 #
 # Build the meteor app!
