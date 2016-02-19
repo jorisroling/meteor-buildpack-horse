@@ -7,6 +7,10 @@ set -e
 # debug verbosely.
 #set -x
 
+indent() {
+  sed -u 's/^/       /'
+}
+
 echo "-----> Install ImageMagick"
 
 BUILD_DIR=$1
