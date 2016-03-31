@@ -1,74 +1,74 @@
-#!/bin/sh
+#! /bin/bash
 
-# Meteor Heroku buildpack for Meteor 0.9.3+.
-
-# fail fast.
 set -e
-# debug verbosely.
-#set -x
 
-# indent() {
-#   sed -u 's/^/       /'
-# }
+source `dirname $0`/../configs.sh
 
-# echo "-----> Install ImageMagick"
+# parse and derive params
+BUILD_DIR=$1
+CACHE_DIR=$2
+LP_DIR=`cd $(dirname $0); cd ..; pwd`
 
-# BUILD_DIR=$1
-# CACHE_DIR=$2
-# VENDOR_DIR="$BUILD_DIR/vendor"
-# INSTALL_DIR="$VENDOR_DIR/imagemagick"
-# CACHE_FILE="$CACHE_DIR/imagemagick.tar.gz"
+indent() {
+  sed -u 's/^/       /'
+}
 
+arrow() {
+  sed -u 's/^/-----> /'
+}
 
-# if [ ! -f $CACHE_FILE ]; then
-#   # install imagemagick
-#   IMAGE_MAGICK_VERSION="${IMAGE_MAGICK_VERSION:-6.9.3-4}"
-#   IMAGE_MAGICK_FILE="ImageMagick-$IMAGE_MAGICK_VERSION.tar.gz"
-#   IMAGE_MAGICK_DIR="ImageMagick-$IMAGE_MAGICK_VERSION"
-#   # SSL cert used on imagemagick not recognized by heroku.
-#   IMAGE_MAGICK_URL="http://www.imagemagick.org/download/releases/$IMAGE_MAGICK_FILE"
+function mktmpdir() {
+  dir=$(mktemp -t imagemagick-$1-XXXX)
+  rm -rf $dir
+  mkdir -p $dir
+  echo $dir
+}
 
-#   echo "-----> Downloading ImageMagick from $IMAGE_MAGICK_URL"
-#   wget $IMAGE_MAGICK_URL -P $BUILD_DIR | indent
-  
-#   echo "-----> Extracting ImageMagick from $BUILD_DIR/$IMAGE_MAGICK_FILE"
-#   if [ ! -f $BUILD_DIR/$IMAGE_MAGICK_FILE ]; then
-#     echo "Error: Unable to download ImageMagick" | indent
-#     ls $BUILD_DIR | indent
-#     exit 1;
-#   fi
-#   tar xvf $BUILD_DIR/$IMAGE_MAGICK_FILE | indent
+function package_download() {
+  local remote location
+  remote="$1"
+  location="$2"
 
-#   echo "-----> Building ImageMagick"
-#   cd $IMAGE_MAGICK_DIR
-#   export CPPFLAGS="-I$INSTALL_DIR/include"
-#   export LDFLAGS="-L$INSTALL_DIR/lib"
-#   ./configure --prefix=$INSTALL_DIR
-#   make && make install
-#   cd ..
-#   rm -rf $IMAGE_MAGICK_DIR
+  mkdir -p $location
+  package="http://s3.amazonaws.com/${S3_BUCKET}/${remote}"
+  curl $package -s -o - | tar xzf - -C $location
+}
 
-#   # cache for future deploys
-#   echo "-----> Caching ImageMagick installation"
-#   cd $VENDOR_DIR
-#   REL_INSTALL_DIR="imagemagick"
-#   tar czf $REL_INSTALL_DIR.tar.gz $REL_INSTALL_DIR
-#   mv $REL_INSTALL_DIR.tar.gz $CACHE_FILE
+# we need this directory, it's our destination
+lib_path=$BUILD_DIR/vendor/imagemagick/lib/
+mkdir -p $lib_path
 
-# else
-#   # cache exists, extract it
-#   echo "-----> Extracting ImageMagick $CACHE_FILE => $VENDOR_DIR"
-#   tar xzf $CACHE_FILE -C $VENDOR_DIR
-# fi
+echo "Installing libpng $LIBPNG_VERSION" | arrow
 
-# # update PATH and LD_LIBRARY_PATH
-# echo "-----> Updating environment variables"
-# PROFILE_PATH="$BUILD_DIR/.profile.d/imagemagick.sh"
-# ACTUAL_INSTALL_PATH="$HOME/vendor/imagemagick"
-# mkdir -p $(dirname $PROFILE_PATH)
-# echo "export PATH=$ACTUAL_INSTALL_PATH/bin:\$PATH" >> $PROFILE_PATH
-# echo "export LD_LIBRARY_PATH=$ACTUAL_INSTALL_PATH/lib:\$LD_LIBRARY_PATH" >> $PROFILE_PATH
+# vendor directories
+VENDORED_LIBPNG="$(mktmpdir libpng)"
+package_download "${REMOTE_PATH}" "${VENDORED_LIBPNG}"
 
+echo "Download completed" | indent
+
+cp -R $VENDORED_LIBPNG/lib/* $lib_path
+
+echo "Installation completed" | indent
+
+echo "Installing imagemagick $IMAGE_MAGICK_VERSION" | arrow
+
+# vendor directories
+VENDORED_IMAGEMAGICK="$(mktmpdir imagemagick)"
+package_download "${REMOTE_PATH}" "${VENDORED_IMAGEMAGICK}"
+
+echo "Download completed" | indent
+
+mkdir -p "$BUILD_DIR/bin/"
+cp $VENDORED_IMAGEMAGICK/bin/* "$BUILD_DIR/bin/"
+
+cp -R $VENDORED_IMAGEMAGICK/lib/* $lib_path
+
+echo "Installation completed" | indent
+
+echo "Building runtime environment for imagemagick" | arrow
+mkdir -p $BUILD_DIR/.profile.d
+echo "export PATH=\"\$HOME/bin:\$PATH\"" > $BUILD_DIR/.profile.d/imagemagick.sh
+echo "export LD_RUN_PATH=\"$lib_path:\$LD_RUN_PATH\"" > $BUILD_DIR/.profile.d/imagemagick.sh
 
 
 
